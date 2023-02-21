@@ -1,0 +1,49 @@
+version: "3.2"
+
+# 定义服务，可以多个
+services:
+  redis-cluster:
+    image: redis:6.0.8
+    command: redis-cli -a 123456  --cluster create  172.21.48.1:6380 172.21.48.1:6381 172.21.48.1:6382 --cluster-replicas 0  --cluster-yes
+    depends_on:
+      - redis-6380
+      - redis-6381
+      - redis-6382
+  redis-6380: # 服务名称
+    image: redis:6.0.8 # 创建容器时所需的镜像
+    container_name: redis-6380 # 容器名称
+    restart: always # 容器总是重新启动
+    ports:
+      - 6380:6380
+      - 16380:16380
+    volumes: # 数据卷，目录挂载
+      - ./etc_rc.local:/etc/rc.local
+      - ./6380/conf/redis.conf:/etc/redis/redis.conf
+      - ./6380/data:/data
+    command: redis-server /etc/redis/redis.conf # 覆盖容器启动后默认执行的命令
+
+  redis-6381:
+    image: redis:6.0.8
+    container_name: redis-6381
+    restart: always
+    ports:
+      - 6381:6381
+      - 16381:16381
+    volumes:
+      - ./etc_rc.local:/etc/rc.local
+      - ./6381/conf/redis.conf:/etc/redis/redis.conf
+      - ./6381/data:/data
+    command: redis-server /etc/redis/redis.conf
+
+  redis-6382:
+    image: redis:6.0.8
+    container_name: redis-6382
+    restart: always
+    ports:
+      - 6382:6382
+      - 16382:16382
+    volumes:
+      - ./etc_rc.local:/etc/rc.local
+      - ./6382/conf/redis.conf:/etc/redis/redis.conf
+      - ./6382/data:/data
+    command: redis-server /etc/redis/redis.conf
